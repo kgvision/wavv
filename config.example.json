@@ -1,0 +1,14 @@
+{
+  "spotify": {
+    "client_id": "YOUR_SPOTIFY_CLIENT_ID",
+    "client_secret": "YOUR_SPOTIFY_CLIENT_SECRET",
+    "redirect_uri": "http://localhost:8888/callback",
+    "open_browser": true
+  },
+  "navidrome": {
+    "url": "http://your-server-ip:4533",
+    "username": "your_navidrome_username",
+    "password": "your_navidrome_password"
+  },
+  "sync_interval_hours": 24
+}
