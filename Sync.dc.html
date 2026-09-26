@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="spotify.js"></script>
+<style>
+::-webkit-scrollbar{display:none}
+body{margin:0;font-family:'Sweet Sans Pro','Helvetica Neue',sans-serif;background:#12161C}
+a{color:inherit;text-decoration:none}
+a:hover{color:#29B6F6}
+input::placeholder{color:#5F6B7A}
+html,body{height:100%}
+body{background:#12161C}
+@media (min-width:600px){body{background:#0A0D11}[data-app]{margin:max(24px, calc((100vh - 844px) / 2)) auto !important;height:844px !important;max-height:calc(100vh - 48px);border-radius:36px;border:1px solid #232B36;box-shadow:0 30px 80px rgba(0,0,0,0.5)}}
+@keyframes wavvSpin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div data-app="1" style="flex-shrink: 0; width: 100%; max-width: 430px; height: 100dvh; margin: 0 auto; box-sizing: border-box; background: #12161C; color: #E6ECF2; display: flex; flex-direction: column; overflow: hidden; font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif">
+
+  <div style="padding: 56px 24px 8px; display: flex; flex-direction: column; gap: 2px">
+    <div style="font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; font-weight: 600; font-size: 30px; letter-spacing: -0.5px">Sync</div>
+    <div style="font-size: 13px; color: #8A96A6">Connect Spotify to bring in your playlists and albums.</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; scrollbar-width: none; padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 16px">
+
+    <div style="flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; background: #1A2029">
+      <div style="width: 48px; height: 48px; border-radius: 24px; background: {{ avatarBg }}; flex-shrink: 0; display: flex; align-items: center; justify-content: center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#12161C"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.6 14.4a.62.62 0 0 1-.86.2c-2.35-1.44-5.3-1.76-8.79-.96a.62.62 0 1 1-.28-1.21c3.81-.87 7.09-.5 9.73 1.12.3.18.39.56.2.85zm1.22-2.72a.78.78 0 0 1-1.07.26c-2.69-1.65-6.79-2.13-9.97-1.17a.78.78 0 1 1-.45-1.49c3.63-1.1 8.15-.57 11.23 1.33.37.22.48.7.26 1.07zm.1-2.84C14.7 8.93 9.37 8.75 6.29 9.69a.94.94 0 1 1-.54-1.8c3.53-1.07 9.42-.86 13.13 1.34a.94.94 0 0 1-.96 1.61z"></path></svg>
+      </div>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+        <div style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ title }}</div>
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #8A96A6">
+          <span style="width: 7px; height: 7px; border-radius: 4px; background: {{ dot }}"></span>{{ subtitle }}
+        </div>
+      </div>
+    </div>
+
+    <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+          <div style="padding: 14px 12px; border-radius: 12px; background: #1A2029; display: flex; flex-direction: column; gap: 2px">
+            <div style="font-size: 22px; font-weight: 600">{{ s.value }}</div>
+            <div style="font-size: 12px; color: #8A96A6">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ needsId }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; border: 1px solid #2F3845">
+        <div style="font-size: 15px; font-weight: 600">One-time setup</div>
+        <div style="font-size: 13px; line-height: 1.5; color: #B8C3D1">Create an app at developer.spotify.com/dashboard, choose “Web API”, and add this Redirect URI:</div>
+        <div style="display: flex; gap: 8px; align-items: center">
+          <div style="flex: 1; min-width: 0; padding: 10px 12px; border-radius: 10px; background: #1A2029; font-size: 12px; color: #E6ECF2; font-family: ui-monospace, Menlo, monospace; word-break: break-all">{{ redirectUri }}</div>
+          <button onClick="{{ copyUri }}" style="flex-shrink: 0; height: 38px; padding: 0 12px; border-radius: 10px; border: none; background: #232B36; color: #E6ECF2; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer">{{ copyLabel }}</button>
+        </div>
+        <div style="font-size: 13px; color: #B8C3D1">Then paste the app’s Client ID:</div>
+        <input type="text" value="{{ idDraft }}" onChange="{{ onIdInput }}" placeholder="Client ID" style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #232B36; background: #1A2029; color: #E6ECF2; font-family: ui-monospace, Menlo, monospace; font-size: 13px; outline: none">
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showPreviewNote }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; padding: 12px 14px; border-radius: 12px; background: rgba(41,182,246,0.12); border: 1px solid rgba(41,182,246,0.35); color: #B8E4FA; font-size: 13px; line-height: 1.5">This is a preview. Spotify only lets you log in from your published site, so open <a href="https://kgvision.github.io/wavv/Sync.dc.html" target="_blank" style="color: #29B6F6; text-decoration: underline">kgvision.github.io/wavv/Sync.dc.html</a> to connect.</div>
+    </sc-if>
+    <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; padding: 12px 14px; border-radius: 12px; background: rgba(201,74,74,0.14); border: 1px solid rgba(201,74,74,0.4); color: #F0B4B4; font-size: 13px; line-height: 1.5">{{ error }}</div>
+    </sc-if>
+
+    <button onClick="{{ primaryAction }}" disabled="{{ busy }}" style="flex-shrink: 0; height: 52px; border-radius: 26px; border: none; background: #29B6F6; color: #12161C; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; opacity: {{ btnOpacity }}">
+      <sc-if value="{{ busy }}" hint-placeholder-val="{{ false }}">
+        <span style="width: 16px; height: 16px; border-radius: 8px; border: 2px solid rgba(18,22,28,0.3); border-top-color: #12161C; animation: wavvSpin 0.8s linear infinite"></span>
+      </sc-if>
+      {{ primaryLabel }}
+    </button>
+
+    <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+      <div style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center">
+        <a href="Library.dc.html" style="font-size: 14px; font-weight: 500; color: #29B6F6">View library →</a>
+        <button onClick="{{ disconnect }}" style="background: none; border: none; color: #8A96A6; font-family: inherit; font-size: 13px; cursor: pointer; padding: 6px 0">Disconnect</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showChangeId }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ changeId }}" style="flex-shrink: 0; align-self: flex-start; background: none; border: none; color: #5F6B7A; font-family: inherit; font-size: 12px; cursor: pointer; padding: 0">Use a different Client ID</button>
+    </sc-if>
+  </div>
+
+  <div style="display: flex; justify-content: space-around; align-items: center; padding: 14px 0 28px; border-top: 1px solid #232B36; background: #151A21">
+    <a href="Library.dc.html" aria-label="Library" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18" rx="1.5"></rect><rect x="14" y="3" width="7" height="10" rx="1.5"></rect></svg>
+      <span style="font-size: 11px; font-weight: 500">Library</span>
+    </a>
+    <a href="Search.dc.html" aria-label="Search" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <span style="font-size: 11px; font-weight: 500">Search</span>
+    </a>
+    <a href="Visuals.dc.html" aria-label="Visuals" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3M6 6v11M10 3v18M14 8v7M18 5v13M22 10v3"></path></svg>
+      <span style="font-size: 11px; font-weight: 500">Visuals</span>
+    </a>
+    <div aria-label="Sync" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #29B6F6">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.5 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.65 4.36A9 9 0 0 0 20.5 15"></path></svg>
+      <span style="font-size: 11px; font-weight: 600">Sync</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  state = { ready: false, busy: false, error: '', lib: null, connected: false, clientId: '', idDraft: '', copied: false, editId: false };
+  S() { return window.WavvSpotify; }
+  async componentDidMount() {
+    const wait = () => new Promise(r => { const t = () => window.WavvSpotify ? r() : setTimeout(t, 30); t(); });
+    await wait();
+    const S = this.S();
+    this.setState({ ready: true, clientId: S.clientId(), idDraft: S.clientId(), connected: S.connected(), lib: S.library() });
+    try {
+      if (await S.handleRedirect()) { this.setState({ connected: true }); await this.runSync(); }
+    } catch (e) { this.setState({ error: e.message }); }
+    this._tick = setInterval(() => this.forceUpdate(), 30000);
+  }
+  componentWillUnmount() { clearInterval(this._tick); }
+  async runSync() {
+    this.setState({ busy: true, error: '' });
+    try { const lib = await this.S().sync(); this.setState({ lib, busy: false }); }
+    catch (e) { this.setState({ busy: false, error: e.message + (/403|not registered|user/i.test(e.message) ? ' — in development mode, add your Spotify account under the app’s User Management.' : '') }); }
+  }
+  async connect() {
+    const id = (this.state.idDraft || '').trim();
+    if (!id) return this.setState({ error: 'Paste your Spotify Client ID first.' });
+    this.S().setClientId(id);
+    this.setState({ busy: true, error: '', clientId: id, editId: false });
+    try {
+      const r = await this.S().login();
+      if (r === 'popup') this.setState({ busy: false, error: 'Spotify opened in a new tab. Finish logging in there; it returns to the Sync page on your site.' });
+    } catch (e) { this.setState({ busy: false, error: e.message }); }
+  }
+  renderVals() {
+    const S = this.S();
+    const { lib, connected, busy, clientId, editId } = this.state;
+    const needsId = this.state.ready && !connected && (!clientId || editId);
+    const synced = connected && lib;
+    return {
+      showPreviewNote: this.state.ready && !connected && !S.onPublishedSite(),
+      connected: !!synced,
+      needsId,
+      showChangeId: this.state.ready && !connected && !!clientId && !editId,
+      busy,
+      btnOpacity: busy ? 0.7 : 1,
+      hasError: !!this.state.error,
+      error: this.state.error,
+      avatarBg: connected ? '#1ED760' : '#46505D',
+      dot: connected ? '#4CA870' : '#5F6B7A',
+      title: synced ? lib.user.name : connected ? 'Spotify connected' : 'Spotify',
+      subtitle: busy ? 'Syncing…' : synced ? 'Synced ' + S.ago(lib.syncedAt) : connected ? 'Ready to sync' : 'Not connected',
+      stats: synced ? [
+        { value: String(lib.playlists.length), label: 'Playlists' },
+        { value: String(lib.albums.length), label: 'Albums' },
+        { value: String(lib.liked), label: 'Liked songs' }
+      ] : [],
+      primaryLabel: busy ? (connected ? 'Syncing…' : 'Opening Spotify…') : connected ? 'Sync now' : 'Connect Spotify',
+      primaryAction: () => connected ? this.runSync() : this.connect(),
+      disconnect: () => { S.disconnect(); this.setState({ connected: false, lib: null, error: '' }); },
+      changeId: () => this.setState({ editId: true }),
+      redirectUri: this.state.ready ? S.redirectUri() : '',
+      copyLabel: this.state.copied ? 'Copied' : 'Copy',
+      copyUri: () => { navigator.clipboard && navigator.clipboard.writeText(S.redirectUri()); this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1500); },
+      idDraft: this.state.idDraft,
+      onIdInput: e => this.setState({ idDraft: e.target.value })
+    };
+  }
+}
+</script>
+</body>
+</html>
