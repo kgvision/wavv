@@ -8,7 +8,7 @@
 <body>
 <x-dc>
 <helmet>
-<script src="spotify.js"></script>
+<script src="spotify.js?v=4"></script>
 <style>
 body{margin:0;font-family:'Sweet Sans Pro', 'Helvetica Neue', sans-serif;background:#12161C}
 a{color:inherit;text-decoration:none}
@@ -136,6 +136,7 @@ async componentDidMount() {
   this.S = S;
   if (!S.connected()) return this.setState({ status: 'Connect Spotify on the Sync tab to play this' });
   this.setState({ status: 'Loading…' });
+  if (typeof S.collection !== 'function') return this.setState({ status: 'Old spotify.js on the site — re-upload it and hard-refresh' });
   let ctx;
   try { ctx = await S.collection(kind, id); } catch (e) { return this.setState({ status: e.message }); }
   const first = ctx.tracks[startAt] || ctx.tracks[0] || null;
