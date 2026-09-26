@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+::-webkit-scrollbar{display:none}
+body{margin:0;font-family:'Sweet Sans Pro', 'Helvetica Neue', sans-serif;background:#12161C}
+a{color:inherit;text-decoration:none}
+a:hover{color:#29B6F6}
+input::placeholder{color:#5F6B7A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #12161C; color: #E6ECF2; display: flex; flex-direction: column; overflow: hidden; font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif">
+
+  <div style="padding: 56px 24px 8px; display: flex; flex-direction: column; gap: 16px">
+    <div style="font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; font-weight: 600; font-size: 30px; letter-spacing: -0.5px">Search</div>
+    <label style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 12px; background: #1A2029; border: 1px solid {{ barBorder }}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A96A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <input type="text" value="{{ query }}" onChange="{{ onInput }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" placeholder="Songs, artists, playlists" style="flex: 1; min-width: 0; background: none; border: none; outline: none; color: #E6ECF2; font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; font-size: 15px">
+      <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+        <button aria-label="Clear search" onClick="{{ clear }}" style="width: 22px; height: 22px; border-radius: 11px; border: none; background: #2F3845; color: #B8C3D1; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+        </button>
+      </sc-if>
+    </label>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; scrollbar-width: none; padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 14px">
+    <sc-if value="{{ showRecent }}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 17px; font-weight: 600">Recent searches</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{ recent }}" as="r" hint-placeholder-count="4">
+            <button onClick="{{ r.pick }}" style="font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; font-size: 14px; font-weight: 500; padding: 8px 14px; border-radius: 20px; border: 1px solid #2F3845; background: transparent; color: #B8C3D1; cursor: pointer">{{ r.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="font-size: 13px; color: #8A96A6; padding-bottom: 6px">{{ resultLabel }}</div>
+        <sc-for list="{{ results }}" as="it" hint-placeholder-count="4">
+          <a href="{{ it.href }}" style="display: flex; align-items: center; gap: 12px; padding: 8px 0">
+            <div style="width: 48px; height: 48px; border-radius: {{ it.radius }}; background: {{ it.bg }}; flex-shrink: 0"></div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+              <div style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.name }}</div>
+              <div style="font-size: 13px; color: #8A96A6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ it.meta }}</div>
+            </div>
+          </a>
+        </sc-for>
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 24px 0; font-size: 14px; color: #5F6B7A">Nothing in your library matches that.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="display: flex; justify-content: space-around; align-items: center; padding: 14px 0 28px; border-top: 1px solid #232B36; background: #151A21">
+    <a href="Library.dc.html" aria-label="Library" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18" rx="1.5"></rect><rect x="14" y="3" width="7" height="10" rx="1.5"></rect></svg>
+      <span style="font-size: 11px; font-weight: 500">Library</span>
+    </a>
+    <div aria-label="Search" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #29B6F6">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <span style="font-size: 11px; font-weight: 600">Search</span>
+    </div>
+    <a href="Visuals.dc.html" aria-label="Visuals" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3M6 6v11M10 3v18M14 8v7M18 5v13M22 10v3"></path></svg>
+      <span style="font-size: 11px; font-weight: 500">Visuals</span>
+    </a>
+    <div aria-label="Sync status" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.5 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.65 4.36A9 9 0 0 0 20.5 15"></path></svg>
+      <span style="font-size: 11px; font-weight: 500">Sync</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  state = { q: '', focus: false };
+  items = [
+    { name: 'Holocene', meta: 'Song · Bon Iver', href: 'Player.dc.html', radius: '8px', bg: 'linear-gradient(160deg,#8FA3B8,#3A4A5C)' },
+    { name: 'Late Night Drives', meta: 'Playlist · 32 tracks', href: 'Player.dc.html', radius: '8px', bg: 'linear-gradient(160deg,#29B6F6,#1E4E8C)' },
+    { name: 'Bon Iver', meta: 'Artist', href: '#', radius: '24px', bg: 'linear-gradient(160deg,#6C8CA8,#2C4058)' },
+    { name: 'Bon Iver, Bon Iver', meta: 'Album · Bon Iver', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#8FA3B8,#3A4A5C)' },
+    { name: 'Sunday Kitchen', meta: 'Playlist · 18 tracks', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#6B8F71,#3E5D45)' },
+    { name: 'Focus — Instrumentals', meta: 'Playlist · 64 tracks', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#7C8FB0,#4A5A78)' },
+    { name: 'Road Trip 2024', meta: 'Playlist · 41 tracks', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#B0708F,#78415A)' },
+    { name: 'In Rainbows', meta: 'Album · Radiohead', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#5A7FA0,#1E2F45)' },
+    { name: 'Radiohead', meta: 'Artist', href: '#', radius: '24px', bg: 'linear-gradient(160deg,#4F8FB8,#1B3550)' },
+    { name: 'Currents', meta: 'Album · Tame Impala', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#7A6FB0,#3A2F6B)' },
+    { name: 'Blonde', meta: 'Album · Frank Ocean', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#9AB0A8,#44605A)' },
+    { name: 'Titanic Rising', meta: 'Album · Weyes Blood', href: '#', radius: '8px', bg: 'linear-gradient(160deg,#4F8FB8,#1B3550)' }
+  ];
+  renderVals() {
+    const q = this.state.q.trim().toLowerCase();
+    const results = q ? this.items.filter(i => (i.name + ' ' + i.meta).toLowerCase().includes(q)) : [];
+    return {
+      query: this.state.q,
+      hasQuery: !!q,
+      showRecent: !q,
+      noResults: !!q && results.length === 0,
+      results,
+      resultLabel: results.length ? `${results.length} result${results.length === 1 ? '' : 's'} in your library` : '',
+      barBorder: this.state.focus ? '#29B6F6' : '#232B36',
+      recent: ['Bon Iver', 'Late Night', 'Radiohead', 'Instrumentals'].map(label => ({ label, pick: () => this.setState({ q: label }) })),
+      onInput: e => this.setState({ q: e.target.value }),
+      onFocus: () => this.setState({ focus: true }),
+      onBlur: () => this.setState({ focus: false }),
+      clear: () => this.setState({ q: '' })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+::-webkit-scrollbar{display:none}
+body{margin:0;font-family:'Sweet Sans Pro', 'Helvetica Neue', sans-serif;background:#12161C}
+a{color:inherit;text-decoration:none}
+a:hover{color:#29B6F6}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #12161C; color: #E6ECF2; display: flex; flex-direction: column; overflow: hidden; font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif">
+
+  <div style="padding: 56px 24px 8px; display: flex; flex-direction: column; gap: 2px">
+    <div style="font-weight: 600; font-size: 30px; letter-spacing: -0.5px">Visuals</div>
+    <div style="font-size: 13px; color: #8A96A6">Pick a style and color. It plays in sync with your music.</div>
+  </div>
+
+  <div style="flex: 1; overflow-y: auto; scrollbar-width: none; padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 20px">
+
+    <div style="flex-shrink: 0; display: flex; flex-direction: column; border-radius: 16px; background: #1A2029; overflow: hidden">
+      <div style="height: 210px; position: relative">
+        <div style="position: absolute; inset: 0; background: {{ songCover }}; opacity: 0.15"></div>
+        <div style="position: absolute; inset: 12px">
+          <x-import component="Visualizer" from="./visualizer.js" viz="{{ style }}" palette="{{ palette }}" bpm="{{ song.bpm }}" auto-colors="{{ song.colors }}" bg="#1A2029" hint-size="100%,100%"></x-import>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid #232B36">
+        <div style="width: 40px; height: 40px; border-radius: 8px; background: {{ songCover }}; flex-shrink: 0"></div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+          <div style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ song.title }}</div>
+          <div style="font-size: 12px; color: #8A96A6; display: flex; align-items: center; gap: 6px"><span style="width: 6px; height: 6px; border-radius: 3px; background: #4CA870"></span>{{ song.artist }} · synced at {{ song.bpm }} BPM</div>
+        </div>
+        <button aria-label="Next song" onClick="{{ nextSong }}" style="width: 36px; height: 36px; border-radius: 18px; border: none; background: #232B36; color: #B8C3D1; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM5 6l9 6-9 6V6z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 17px; font-weight: 600">Style</span><span style="font-size: 13px; color: #8A96A6">{{ styleName }}</span></div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px">
+        <sc-for list="{{ styles }}" as="s" hint-placeholder-count="12">
+          <button onClick="{{ s.pick }}" aria-pressed="{{ s.on }}" style="display: flex; flex-direction: column; gap: 6px; padding: 6px; border-radius: 12px; border: 2px solid {{ s.border }}; background: #1A2029; cursor: pointer; font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; min-width: 0">
+            <div style="width: 100%; height: 62px">
+              <x-import component="Visualizer" from="./visualizer.js" viz="{{ s.id }}" palette="{{ palette }}" bpm="{{ song.bpm }}" auto-colors="{{ song.colors }}" seed="{{ s.seed }}" bg="#1A2029" hint-size="100%,62px"></x-import>
+            </div>
+            <div style="font-size: 12px; font-weight: 600; color: {{ s.color }}; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ s.name }}</div>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 17px; font-weight: 600">Color</span><span style="font-size: 13px; color: #8A96A6">{{ paletteName }}</span></div>
+      <div style="display: flex; justify-content: space-between">
+        <sc-for list="{{ palettes }}" as="c" hint-placeholder-count="9">
+          <button onClick="{{ c.pick }}" aria-label="{{ c.name }}" aria-pressed="{{ c.on }}" style="width: 32px; height: 32px; border-radius: 16px; padding: 0; border: 2px solid {{ c.border }}; background: {{ c.bg }}; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #12161C; font-size: 10px; font-weight: 700; font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif">{{ c.mark }}</button>
+        </sc-for>
+      </div>
+      <div style="font-size: 12px; color: #5F6B7A">Auto matches each song's cover art.</div>
+    </div>
+
+    <a href="Player.dc.html" style="flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 12px; background: rgba(41,182,246,0.14); border: 1px solid rgba(41,182,246,0.4); font-size: 14px; font-weight: 600; color: #E6ECF2">
+      See it in Now Playing
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+    </a>
+  </div>
+
+  <div style="display: flex; justify-content: space-around; align-items: center; padding: 14px 0 28px; border-top: 1px solid #232B36; background: #151A21">
+    <a href="Library.dc.html" aria-label="Library" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18" rx="1.5"></rect><rect x="14" y="3" width="7" height="10" rx="1.5"></rect></svg>
+      <span style="font-size: 11px; font-weight: 500">Library</span>
+    </a>
+    <a href="Search.dc.html" aria-label="Search" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+      <span style="font-size: 11px; font-weight: 500">Search</span>
+    </a>
+    <div aria-label="Visuals" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #29B6F6">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10v3M6 6v11M10 3v18M14 8v7M18 5v13M22 10v3"></path></svg>
+      <span style="font-size: 11px; font-weight: 600">Visuals</span>
+    </div>
+    <div aria-label="Sync status" style="display: flex; flex-direction: column; align-items: center; gap: 4px; color: #7C8898">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"></path><path d="M3.5 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.65 4.36A9 9 0 0 0 20.5 15"></path></svg>
+      <span style="font-size: 11px; font-weight: 500">Sync</span>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
+class Component extends DCLogic {
+  STYLES = [
+    ['bars', 'Bars'], ['mirror', 'Mirror'], ['wave', 'Wave'], ['radial', 'Radial'],
+    ['rings', 'Rings'], ['dots', 'Dot grid'], ['particles', 'Particles'], ['blob', 'Blob'],
+    ['mountains', 'Terrain'], ['pixel', 'Pixel'], ['spiral', 'Spiral'], ['ridges', 'Ridges']
+  ];
+  PALETTES = [
+    ['auto', 'Auto', null], ['glacier', 'Glacier', ['#1E4E8C', '#29B6F6', '#E6ECF2']], ['aurora', 'Aurora', ['#14D8EA', '#4AA8FF', '#9A5CFF', '#FF5EC4']],
+    ['ember', 'Ember', ['#8B1E2B', '#E4572E', '#FFB86B']], ['mono', 'Mono', ['#5F6B7A', '#E6ECF2']], ['lagoon', 'Lagoon', ['#0F766E', '#2DD4BF', '#CCFBF1']],
+    ['sunset', 'Sunset', ['#6D28D9', '#DB2777', '#F59E0B']], ['lime', 'Lime', ['#14532D', '#84CC16', '#ECFCCB']], ['violet', 'Violet', ['#312E81', '#8B5CF6', '#E9D5FF']]
+  ];
+  SONGS = [
+    { title: 'Holocene', artist: 'Bon Iver', bpm: 72, colors: ['#1E4E8C', '#29B6F6', '#E6ECF2'] },
+    { title: 'Let It Happen', artist: 'Tame Impala', bpm: 125, colors: ['#3A2F6B', '#7A6FB0', '#FF5EC4'] },
+    { title: 'Weird Fishes', artist: 'Radiohead', bpm: 152, colors: ['#1E2F45', '#5A7FA0', '#F59E0B'] },
+    { title: 'Nikes', artist: 'Frank Ocean', bpm: 88, colors: ['#44605A', '#9AB0A8', '#ECFCCB'] }
+  ];
+  constructor(p) {
+    super(p);
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('wavv.visual') || '{}'); } catch (e) {}
+    this.state = { style: saved.style || 'bars', palette: saved.palette || 'auto', song: 0 };
+  }
+  save(patch) {
+    this.setState(patch, () => {
+      localStorage.setItem('wavv.visual', JSON.stringify({ style: this.state.style, palette: this.state.palette }));
+      window.dispatchEvent(new Event('wavv-visual'));
+    });
+  }
+  renderVals() {
+    const { style, palette } = this.state;
+    const song = this.SONGS[this.state.song];
+    const g = c => c.length > 1 ? `linear-gradient(160deg, ${c.join(', ')})` : c[0];
+    const curStyle = this.STYLES.find(s => s[0] === style) || this.STYLES[0];
+    const curPal = this.PALETTES.find(p => p[0] === palette) || this.PALETTES[0];
+    return {
+      style, palette, song,
+      songCover: g(song.colors),
+      styleName: curStyle[1],
+      paletteName: curPal[1],
+      nextSong: () => this.setState(s => ({ song: (s.song + 1) % this.SONGS.length })),
+      styles: this.STYLES.map(([id, name], i) => ({
+        id, name, seed: i * 1.7, on: id === style,
+        border: id === style ? '#29B6F6' : 'transparent',
+        color: id === style ? '#29B6F6' : '#B8C3D1',
+        pick: () => this.save({ style: id })
+      })),
+      palettes: this.PALETTES.map(([id, name, colors]) => ({
+        name, on: id === palette, mark: id === 'auto' ? 'A' : '',
+        bg: g(colors || song.colors),
+        border: id === palette ? '#E6ECF2' : '#2F3845',
+        pick: () => this.save({ palette: id })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
