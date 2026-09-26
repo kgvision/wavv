@@ -8,6 +8,7 @@
 <body>
 <x-dc>
 <helmet>
+<script src="spotify.js"></script>
 <style>
 body{margin:0;font-family:'Sweet Sans Pro', 'Helvetica Neue', sans-serif;background:#12161C}
 a{color:inherit;text-decoration:none}
@@ -43,7 +44,7 @@ body{background:#12161C}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E6ECF2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
     </a>
     <div style="text-align: center">
-      <div style="font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #8A96A6; text-transform: uppercase">Late Night Drives</div>
+      <div style="font-size: 11px; font-weight: 600; letter-spacing: 1px; color: #8A96A6; text-transform: uppercase; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ contextName }}</div>
     </div>
     <div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 18px; background: #1A2029">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E6ECF2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg>
@@ -56,10 +57,10 @@ body{background:#12161C}
 
     <div style="font-size: 12px; color: #5F6B7A; display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 4px">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5F6B7A" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="7" height="18" rx="1.5"></rect><rect x="14" y="3" width="7" height="10" rx="1.5"></rect></svg>
-        Streaming from your library
+        {{ status }}
       </div><div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;position:relative">
-      <div style="position: absolute; left: 50%; top: 0; width: 300px; height: 300px; transform: translateX(-50%); border-radius: 16px; background: linear-gradient(160deg,#29B6F6,#1E4E8C); opacity: 0.15; -webkit-mask-image: linear-gradient(to bottom, #000 25%, rgba(0,0,0,0.333) 75%); mask-image: linear-gradient(to bottom, #000 25%, rgba(0,0,0,0.333) 75%); display: flex; align-items: center; justify-content: center; pointer-events: none">
-        <svg width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="#12161C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <div style="position: absolute; left: 50%; top: 0; width: 300px; height: 300px; transform: translateX(-50%); border-radius: 16px; background: {{ coverBg }}; opacity: 0.15; -webkit-mask-image: linear-gradient(to bottom, #000 25%, rgba(0,0,0,0.333) 75%); mask-image: linear-gradient(to bottom, #000 25%, rgba(0,0,0,0.333) 75%); display: flex; align-items: center; justify-content: center; pointer-events: none">
+        <svg width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="#12161C" opacity="{{ noteOpacity }}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
       </div>
       <div style="position: relative; width: 300px; height: 300px">
         <x-import component="Visualizer" from="./visualizer.js" saved="{{ true }}" bpm="{{ bpm }}" auto-colors="{{ autoColors }}" hint-size="300px,300px"></x-import>
@@ -71,30 +72,35 @@ body{background:#12161C}
     </div>
 
     <div style="text-align: center; display: flex; flex-direction: column; gap: 6px; width: 100%">
-      <div style="font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; font-weight: 600; font-size: 24px; color: #E6ECF2">Holocene</div>
-      <div style="font-size: 15px; color: #8A96A6">Bon Iver</div>
+      <div style="font-family: 'Sweet Sans Pro', 'Helvetica Neue', sans-serif; font-weight: 600; font-size: 24px; color: #E6ECF2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ title }}</div>
+      <div style="font-size: 15px; color: #8A96A6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ artist }}</div>
       
     </div>
 
     <div style="width: 100%; display: flex; flex-direction: column; gap: 8px">
-      <div style="width: 100%; height: 4px; border-radius: 2px; background: #232B36; position: relative">
-        <div style="position: absolute; left: 0; top: 0; height: 4px; width: 38%; border-radius: 2px; background: linear-gradient(90deg, #4A8FE7, #8B1E2B)"></div>
+      <div onClick="{{ seek }}" style="width: 100%; height: 4px; border-radius: 2px; background: #232B36; position: relative; cursor: pointer; padding: 8px 0; background-clip: content-box">
+        <div style="position: absolute; left: 0; top: 8px; height: 4px; width: {{ progress }}; border-radius: 2px; background: linear-gradient(90deg, #4A8FE7, #8B1E2B)"></div>
       </div>
       <div style="display: flex; justify-content: space-between; font-size: 12px; color: #5F6B7A">
-        <span>1:47</span>
-        <span>4:36</span>
+        <span>{{ elapsed }}</span>
+        <span>{{ duration }}</span>
       </div>
     </div>
 
     <div style="align-self: stretch; display: flex; flex-direction: column; align-items: center; gap: 20px">
     <div style="display: flex; align-items: center; justify-content: center; gap: 36px">
-      <button aria-label="Previous track" style="background: none; border: none; color: #B8C3D1; cursor: pointer">
+      <button aria-label="Previous track" onClick="{{ prev }}" style="background: none; border: none; color: #B8C3D1; cursor: pointer">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM19 6l-9 6 9 6V6z"></path></svg>
       </button>
-      <button aria-label="Pause" style="background: rgba(41,182,246,0.28); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(41,182,246,0.5); width: 64px; height: 64px; border-radius: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="#E6ECF2"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+      <button aria-label="{{ playLabel }}" onClick="{{ togglePlay }}" style="background: rgba(41,182,246,0.28); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(41,182,246,0.5); width: 64px; height: 64px; border-radius: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <sc-if value="{{ playing }}" hint-placeholder-val="{{ true }}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#E6ECF2"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+        </sc-if>
+        <sc-if value="{{ paused }}" hint-placeholder-val="{{ false }}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#E6ECF2"><path d="M8 5.5v13l11-6.5z"></path></svg>
+        </sc-if>
       </button>
-      <button aria-label="Next track" style="background: none; border: none; color: #B8C3D1; cursor: pointer">
+      <button aria-label="Next track" onClick="{{ next }}" style="background: none; border: none; color: #B8C3D1; cursor: pointer">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM5 6l9 6-9 6V6z"></path></svg>
       </button>
     </div>
@@ -104,23 +110,101 @@ body{background:#12161C}
       </button>
     </div>
 
+    <sc-if value="{{ showEmbed }}" hint-placeholder-val="{{ false }}">
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 8px">
+        <div style="font-size: 12px; color: #8A96A6; line-height: 1.5">{{ embedNote }}</div>
+        <iframe src="{{ embedSrc }}" title="Spotify player" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" style="border: none; border-radius: 12px"></iframe>
+      </div>
+    </sc-if>
+
   </div>
 
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844}}">
 class Component extends DCLogic {
-state = { shuffle: false };
+state = { shuffle: false, mode: 'demo', ctx: null, track: null, pos: 107000, dur: 276000, paused: false, at: 0, status: 'Streaming from your library', embed: null };
+async componentDidMount() {
+  this._t = setInterval(() => { if (!this.state.paused) this.forceUpdate(); }, 500);
+  const q = new URLSearchParams(location.search);
+  const kind = q.get('playlist') ? 'playlist' : q.get('album') ? 'album' : q.get('liked') ? 'liked' : null;
+  if (!kind) return;
+  const id = q.get(kind);
+  const startAt = parseInt(q.get('i') || '0', 10) || 0;
+  await new Promise(r => { const t = () => window.WavvSpotify ? r() : setTimeout(t, 30); t(); });
+  const S = window.WavvSpotify;
+  this.S = S;
+  if (!S.connected()) return this.setState({ status: 'Connect Spotify on the Sync tab to play this' });
+  this.setState({ status: 'Loading…' });
+  let ctx;
+  try { ctx = await S.collection(kind, id); } catch (e) { return this.setState({ status: e.message }); }
+  const first = ctx.tracks[startAt] || ctx.tracks[0] || null;
+  this.setState({ ctx, track: first, pos: 0, dur: first ? first.ms : 0, paused: true, mode: 'loading' }, () => this.publish());
+  const lib = S.library();
+  const premium = lib && lib.user && lib.user.product === 'premium';
+  const embed = { src: kind === 'liked' ? (first ? `https://open.spotify.com/embed/track/${first.id}?utm_source=generator&theme=0` : '') : `https://open.spotify.com/embed/${kind}/${id}?utm_source=generator&theme=0`, note: '' };
+  if (!premium || !S.canStream()) {
+    embed.note = !S.canStream() ? 'Reconnect on the Sync tab to play full songs here (Premium). Meanwhile, use this player:' : 'Full in-page playback needs Spotify Premium. Play with this player instead:';
+    return this.setState({ mode: 'embed', embed, status: kind === 'playlist' ? 'Playlist' : kind === 'liked' ? 'Liked Songs' : 'Album' });
+  }
+  try {
+    this.setState({ status: 'Connecting player…' });
+    const { player, deviceId } = await S.initPlayer((st, err) => this.onState(st, err));
+    this.player = player; this.deviceId = deviceId;
+    await S.play(deviceId, ctx.uri, startAt, kind === 'liked' ? ctx.tracks.map(t => t.uri) : null);
+    this.setState({ mode: 'sdk', status: 'Playing on Wavv' });
+  } catch (e) {
+    embed.note = 'Couldn’t start in-page playback (' + e.message + '). Use this player instead:';
+    this.setState({ mode: 'embed', embed, status: kind === 'playlist' ? 'Playlist' : 'Album' });
+  }
+}
+componentWillUnmount() { clearInterval(this._t); this.player && this.player.disconnect(); }
+onState(st, err) {
+  if (err) return this.setState({ status: err });
+  if (!st) return;
+  const t = st.track_window && st.track_window.current_track;
+  if (t) this.setState({ track: { name: t.name, artist: t.artists.map(a => a.name).join(', '), image: t.album && t.album.images && t.album.images[0] && t.album.images[0].url }, dur: st.duration });
+  this.setState({ pos: st.position, paused: st.paused, at: performance.now(), shuffle: st.shuffle }, () => this.publish());
+}
+publish() {
+  const { track, pos, dur, paused } = this.state;
+  if (!track) return;
+  try { localStorage.setItem('wavv.nowPlaying', JSON.stringify({ title: track.name, artist: track.artist, image: track.image || null, pos, dur, paused, at: Date.now(), href: location.search })); } catch (e) {}
+}
+fmt(ms) { const s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+curPos() { const { pos, paused, at, dur, mode } = this.state; if (mode !== 'sdk' || paused) return pos; return Math.min(dur, pos + (performance.now() - at)); }
 renderVals() {
-const on = this.state.shuffle;
-return {
-  bpm: 72,
-  autoColors: ['#1E4E8C', '#29B6F6', '#E6ECF2'],
-  shuffleOn: on,
-  shuffleColor: on ? '#29B6F6' : '#B8C3D1',
-  shuffleDot: on ? 1 : 0,
-  toggleShuffle: () => this.setState(s => ({ shuffle: !s.shuffle }))
-};
+  const { shuffle: on, mode, ctx, track, dur, paused, embed } = this.state;
+  const pos = this.curPos();
+  const sdk = mode === 'sdk' && this.player;
+  const img = track && track.image;
+  return {
+    contextName: ctx ? ctx.name : 'Late Night Drives',
+    status: this.state.status,
+    title: track ? track.name : (mode === 'demo' ? 'Holocene' : '—'),
+    artist: track ? track.artist : (mode === 'demo' ? 'Bon Iver' : ''),
+    coverBg: img ? `center / cover no-repeat url("${img}")` : 'linear-gradient(160deg,#29B6F6,#1E4E8C)',
+    noteOpacity: img ? 0 : 1,
+    progress: dur ? (pos / dur * 100).toFixed(2) + '%' : '0%',
+    elapsed: this.fmt(pos),
+    duration: this.fmt(dur),
+    playing: !paused,
+    paused: !!paused,
+    playLabel: paused ? 'Play' : 'Pause',
+    togglePlay: () => sdk ? this.player.togglePlay() : this.setState(s => ({ paused: !s.paused })),
+    next: () => sdk && this.player.nextTrack(),
+    prev: () => sdk && this.player.previousTrack(),
+    seek: e => { if (!sdk || !dur) return; const r = e.currentTarget.getBoundingClientRect(); this.player.seek(Math.round((e.clientX - r.left) / r.width * dur)); },
+    showEmbed: mode === 'embed',
+    embedSrc: embed ? embed.src : '',
+    embedNote: embed ? embed.note : '',
+    bpm: paused ? 40 : 100,
+    autoColors: ['#1E4E8C', '#29B6F6', '#E6ECF2'],
+    shuffleOn: on,
+    shuffleColor: on ? '#29B6F6' : '#B8C3D1',
+    shuffleDot: on ? 1 : 0,
+    toggleShuffle: () => { const v = !this.state.shuffle; this.setState({ shuffle: v }); if (sdk) this.S.setShuffle(this.deviceId, v).catch(() => {}); }
+  };
 }
 }
 </script>
